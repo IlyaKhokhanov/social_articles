@@ -47,12 +47,77 @@ const handleJWTRefresh = async () => {
   }).then((res) => res.json());
 };
 
+const changePassword = async (data: IChangePassword) => {
+  const accessToken = getToken('access');
+  return fetch(`${url}change-password/`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(data),
+  }).then((res) => res.json());
+};
+
+const articleManipulations = async (method: string, id?: number | string, data?: IAddArticle) => {
+  const accessToken = getToken('access');
+  return fetch(`${url}articles/${id + '/' || ''}`, {
+    method,
+    headers: {
+      // 'Content-Type': 'application/json',
+      // 'Content-Type': 'multipart/form-data',
+      // 'Content-Type': 'multipart/form-data; boundary="----WebKitFormBoundary7MA4YWxkTrZu0gW"',
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: data ? JSON.stringify(data) : '',
+  });
+};
+
+const addComment = async (articleid: number, data: { content: string; parent?: number | null }) => {
+  const accessToken = getToken('access');
+  return fetch(`${url}articles/${articleid}/comments/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: data ? JSON.stringify(data) : '',
+  }).then((res) => res.json());
+};
+
+const deleteComment = async (articleid: number, commentId: number) => {
+  const accessToken = getToken('access');
+  return fetch(`${url}articles/${articleid}/comments/${commentId}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+};
+
+const changeComment = async (articleid: number, commentId: number, data: { content: string }) => {
+  const accessToken = getToken('access');
+  return fetch(`${url}articles/${articleid}/comments/${commentId}/`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(data),
+  }).then((res) => res.json());
+};
 
 export {
+  getToken,
+  storeToken,
+  removeTokens,
+  registration,
   login,
   handleJWTRefresh,
-  registration,
-  storeToken,
-  getToken,
-  removeTokens,
+  changePassword,
+  articleManipulations,
+  addComment,
+  deleteComment,
+  changeComment,
 };

@@ -4,7 +4,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 
 import { ActionButtons, Button } from '@/components';
 import { useAppSelector } from '@/redux/hooks';
@@ -30,7 +29,7 @@ export const ListArticles = ({ data }: { data: IArticle[] }) => {
       {username && <ActionButtons editBtn={{ cb: addArticleHandle, text: 'Написать статью' }} />}
       <div className={styles.articles}>
         {data.map((el) => (
-          <div className={styles.card} key={uuidv4()}>
+          <div className={styles.card} key={el.id}>
             <h2 className={styles.title}>{el.title}</h2>
             {el.image ? (
               <Image

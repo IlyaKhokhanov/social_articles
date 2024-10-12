@@ -33,14 +33,11 @@ export const ChangeForm = () => {
   const onSubmit = (formData: IChangePassword) => {
     changePassword(formData)
       .then((res) => {
-        console.log(res);
         if (res.detail) {
           handleJWTRefresh().then((res) => {
-            console.log(res);
             if (res.access) {
               storeToken(res.access, 'access');
               changePassword(formData).then((res) => {
-                console.log(res);
                 if (res.Success) {
                   reset();
                   router.replace('/');
@@ -58,9 +55,7 @@ export const ChangeForm = () => {
           setError(true);
         }
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
 
   useEffect(() => {

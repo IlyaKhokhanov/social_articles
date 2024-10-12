@@ -33,30 +33,29 @@ export const Header = () => {
   return (
     <header className={styles.header}>
       <div className={styles.container}>
-        <div className={styles.menu}>
-          <Link href={`/`}>
-            <Button isActive={pathname === `/`}>Articles</Button>
-          </Link>
-          {username ? (
-            <>
-              <Link href={`/changepassword`}>
-                <Button isActive={pathname === `/changepassword`}>Change password</Button>
-              </Link>
-              <Button onClick={logout} isActive={pathname === `/logout`}>
-                Log out
-              </Button>
-            </>
-          ) : (
-            <>
-              <Link href={`/signin`}>
-                <Button isActive={pathname === `/signin`}>Sign in</Button>
-              </Link>
-              <Link href={`/signup`}>
-                <Button isActive={pathname === `/signup`}>Sign up</Button>
-              </Link>
-            </>
-          )}
-        </div>
+        <Link href={`/`}>
+          <Button isActive={pathname === `/`}>Articles</Button>
+        </Link>
+
+        {username ? (
+          <div className={styles.user}>
+            <Link href={`/changepassword`}>
+              <Button isActive={pathname === `/changepassword`}>Change password</Button>
+            </Link>
+            <Button onClick={logout} isActive={pathname === `/logout`}>
+              Log out
+            </Button>
+          </div>
+        ) : (
+          <div className={styles.user}>
+            <Link href={`/signin`}>
+              <Button isActive={pathname === `/signin`}>Sign in</Button>
+            </Link>
+            <Link href={`/signup`}>
+              <Button isActive={pathname === `/signup`}>Sign up</Button>
+            </Link>
+          </div>
+        )}
       </div>
     </header>
   );

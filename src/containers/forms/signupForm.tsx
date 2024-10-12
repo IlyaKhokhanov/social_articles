@@ -10,10 +10,10 @@ import { schemaRegister } from './validation';
 import { FormError } from './formError';
 import { ISignup } from '@/types';
 import { Button } from '@/components';
-
-import styles from './form.module.css';
 import { registration } from '@/services/apiActions';
 import { useAppSelector } from '@/redux/hooks';
+
+import styles from './form.module.css';
 
 export const SignupForm = () => {
   const { user } = useAppSelector((state) => state.app);
@@ -33,7 +33,6 @@ export const SignupForm = () => {
   const onSubmit = (formData: ISignup) => {
     registration(formData)
       .then((res) => {
-        console.log(res);
         if (!res.user) {
           setError(res.username[0] || res.email[0]);
         } else {
@@ -41,14 +40,12 @@ export const SignupForm = () => {
           router.replace('/signin');
         }
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
 
-  // useEffect(() => {
-  //   if (user) router.replace('/');
-  // }, [user, router]);
+  useEffect(() => {
+    if (user) router.replace('/');
+  }, [user, router]);
 
   return (
     <div className={styles.container}>
