@@ -1,6 +1,8 @@
 import { Roboto } from 'next/font/google';
 import { ReactNode } from 'react';
 
+import { Header, ReduxProvider } from '@/components';
+
 import '../styles/globals.css';
 
 type LayoutProps = {
@@ -17,7 +19,10 @@ const RootLayout = ({ children }: LayoutProps) => {
   return (
     <html lang="en" className={roboto.className}>
       <body>
-        {children}
+        <ReduxProvider>
+          <Header />
+          <main className="main">{children}</main>
+        </ReduxProvider>
       </body>
     </html>
   );
