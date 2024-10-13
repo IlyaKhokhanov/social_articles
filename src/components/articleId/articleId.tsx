@@ -8,6 +8,7 @@ import { ActionButtons, Comment, WriterComment } from '@/components';
 import { articleManipulations, handleJWTRefresh, storeToken } from '@/services/apiActions';
 import { useAppSelector } from '@/redux/hooks';
 import { IArticle, IComment } from '@/types';
+import { showToast } from '@/utils';
 
 import styles from './articleId.module.css';
 
@@ -23,11 +24,13 @@ export const ArticleId = ({ article, comments }: { article: IArticle; comments: 
   }, [user]);
 
   const deleteArticleHandle = useCallback(() => {
+    showToast({ message: 'Идет удаление...', thisError: false });
     articleManipulations('DELETE', article.id)
       .then((res) => {
         if (res.ok) {
           router.replace('/');
           router.refresh();
+          showToast({ message: 'Статья удалена', thisError: false });
         } else {
           handleJWTRefresh()
             .then((res) => {
@@ -38,6 +41,7 @@ export const ArticleId = ({ article, comments }: { article: IArticle; comments: 
                     if (res.ok) {
                       router.replace('/');
                       router.refresh();
+                      showToast({ message: 'Статья удалена', thisError: false });
                     }
                   })
                   .catch((err) => console.error(err));

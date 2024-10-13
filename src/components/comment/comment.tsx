@@ -8,6 +8,7 @@ import { setCommentAnswer } from '@/redux/slices/appSlice';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { Button } from '../button/button';
 import { IComment } from '@/types';
+import { showToast } from '@/utils';
 
 import styles from './comment.module.css';
 
@@ -40,10 +41,12 @@ export const Comment = ({ comment }: { comment: IComment }) => {
   };
 
   const deleteCommentHandler = () => {
+    showToast({ message: 'Идет удаление...', thisError: false });
     deleteComment(comment.article, comment.id)
       .then((res) => {
         if (res.ok) {
           router.refresh();
+          showToast({ message: 'Комментарий удален', thisError: false });
         } else {
           handleJWTRefresh()
             .then((res) => {
@@ -52,6 +55,7 @@ export const Comment = ({ comment }: { comment: IComment }) => {
                 deleteComment(comment.article, comment.id)
                   .then((res) => {
                     if (res.ok) router.refresh();
+                    showToast({ message: 'Комментарий удален', thisError: false });
                   })
                   .catch((err) => console.error(err));
               }
@@ -63,10 +67,12 @@ export const Comment = ({ comment }: { comment: IComment }) => {
   };
 
   const changeCommetHandler = () => {
+    showToast({ message: 'Изменение отправляется...', thisError: false });
     changeComment(comment.article, comment.id, { content: textComment })
       .then((res) => {
         if (res.content) {
           setEditMode(false);
+          showToast({ message: 'Изменение отправлено', thisError: false });
         } else {
           handleJWTRefresh()
             .then((res) => {
@@ -74,7 +80,10 @@ export const Comment = ({ comment }: { comment: IComment }) => {
                 storeToken(res.access, 'access');
                 changeComment(comment.article, comment.id, { content: textComment })
                   .then((res) => {
-                    if (res.content) setEditMode(false);
+                    if (res.content) {
+                      setEditMode(false);
+                      showToast({ message: 'Изменение отправлено', thisError: false });
+                    }
                   })
                   .catch((err) => console.error(err));
               }

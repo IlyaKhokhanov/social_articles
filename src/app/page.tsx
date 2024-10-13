@@ -1,4 +1,4 @@
-import { ListArticles } from '@/containers';
+import { ListArticles } from '@/components';
 import { IArticle } from '@/types';
 
 async function getServerSideProps(): Promise<IArticle[]> {

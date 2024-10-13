@@ -15,6 +15,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { setUser } from '@/redux/slices/appSlice';
 
 import styles from './form.module.css';
+import { showToast } from '@/utils';
 
 export const SigninForm = () => {
   const dispatch = useAppDispatch();
@@ -33,6 +34,7 @@ export const SigninForm = () => {
   });
 
   const onSubmit = (formData: ISignin) => {
+    showToast({ message: 'Выполненяется вход...', thisError: false });
     login(formData)
       .then((res) => {
         if (res.refresh && res.access) {
@@ -42,8 +44,13 @@ export const SigninForm = () => {
           localStorage.setItem('user', formData.username);
           reset();
           router.replace('/');
+          showToast({ message: 'Вы успешно вошли', thisError: false });
         } else {
           setError(true);
+          showToast({
+            message: 'Не найдена активная учетная запись с указанными учетными данными',
+            thisError: true,
+          });
         }
       })
       .catch((err) => console.error(err));

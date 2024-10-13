@@ -47,7 +47,7 @@ export const ListArticles = ({ data }: { data: IArticle[] }) => {
 
             <div className={styles.text}>
               {el.content.substring(0, 50)}
-              <Link className={styles.link} href={`/${el.id}`}>
+              <Link href={`/${el.id}`}>
                 <Button className={styles.readMore}>Читать далее</Button>
               </Link>
             </div>

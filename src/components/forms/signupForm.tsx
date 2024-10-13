@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -13,6 +12,7 @@ import { ISignup } from '@/types';
 import { Button } from '@/components';
 import { registration } from '@/services/apiActions';
 import { useAppSelector } from '@/redux/hooks';
+import { showToast } from '@/utils';
 
 import styles from './form.module.css';
 
@@ -32,13 +32,16 @@ export const SignupForm = () => {
   });
 
   const onSubmit = (formData: ISignup) => {
+    showToast({ message: 'Идет отправка данных...', thisError: false });
     registration(formData)
       .then((res) => {
         if (!res.user) {
+          showToast({ message: 'Имя пользователя уже занято', thisError: true });
           setError(res.username[0] || res.email[0]);
         } else {
           reset();
           router.replace('/signin');
+          showToast({ message: 'Пользователь зарегистрирован', thisError: false });
         }
       })
       .catch((err) => console.error(err));

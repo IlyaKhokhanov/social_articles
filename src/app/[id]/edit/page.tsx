@@ -1,4 +1,4 @@
-import { WriteArticleForm } from '@/containers';
+import { WriteArticleForm } from '@/components';
 import { IArticle } from '@/types';
 
 async function getServerSideProps(id: string): Promise<IArticle> {

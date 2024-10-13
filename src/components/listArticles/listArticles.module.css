@@ -23,7 +23,6 @@
   gap: 10px;
   background: #616161;
   border-radius: 5px;
-  cursor: pointer;
   box-shadow: 0 3px 20px 0 rgba(207, 207, 207, 0.2);
 }
 
@@ -46,10 +45,6 @@
   overflow-wrap: break-word;
 }
 
-.link {
-  margin-top: 5px;
-  margin-left: 10px;
-}
 
 .readMore {
   padding: 5px;

@@ -1,4 +1,4 @@
-import { SigninForm } from '@/containers';
+import { SigninForm } from '@/components';
 
 const SigninPage = () => {
   return <SigninForm />;

@@ -1,4 +1,4 @@
-import { ArticleId } from '@/containers';
+import { ArticleId } from '@/components';
 import { IArticle, IComment } from '@/types';
 
 type ArticleType = {

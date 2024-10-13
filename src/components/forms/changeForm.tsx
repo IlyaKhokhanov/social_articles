@@ -12,6 +12,7 @@ import { IChangePassword } from '@/types';
 import { Button } from '@/components';
 import { changePassword, handleJWTRefresh, storeToken } from '@/services/apiActions';
 import { useAppSelector } from '@/redux/hooks';
+import { showToast } from '@/utils';
 
 import styles from './form.module.css';
 
@@ -31,6 +32,7 @@ export const ChangeForm = () => {
   });
 
   const onSubmit = (formData: IChangePassword) => {
+    showToast({ message: 'Идет отправка данных...', thisError: false });
     changePassword(formData)
       .then((res) => {
         if (res.detail) {
@@ -43,8 +45,10 @@ export const ChangeForm = () => {
                     if (res.Success) {
                       reset();
                       router.replace('/');
+                      showToast({ message: 'Пароль обновлен', thisError: false });
                     } else {
                       setError(true);
+                      showToast({ message: 'Старый пароль введен неверно', thisError: true });
                     }
                   })
                   .catch((err) => console.error(err));
@@ -55,8 +59,10 @@ export const ChangeForm = () => {
         if (res.Success) {
           reset();
           router.replace('/');
+          showToast({ message: 'Пароль обновлен', thisError: false });
         } else {
           setError(true);
+          showToast({ message: 'Старый пароль введен неверно', thisError: true });
         }
       })
       .catch((err) => console.error(err));

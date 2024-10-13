@@ -1,15 +1,17 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { Toaster } from 'react-hot-toast';
 import Link from 'next/link';
 
-import styles from './header.module.css';
 import { Button } from '@/components';
-import { useRouter } from 'next/navigation';
 import { removeTokens } from '@/services/apiActions';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { setUser } from '@/redux/slices/appSlice';
-import { useEffect, useState } from 'react';
+
+import styles from './header.module.css';
 
 export const Header = () => {
   const dispatch = useAppDispatch();
@@ -31,32 +33,45 @@ export const Header = () => {
   }, [user]);
 
   return (
-    <header className={styles.header}>
-      <div className={styles.container}>
-        <Link href={`/`}>
-          <Button isActive={pathname === `/`}>Articles</Button>
-        </Link>
+    <>
+      <header className={styles.header}>
+        <div className={styles.container}>
+          <Link href={`/`}>
+            <Button isActive={pathname === `/`}>Статьи</Button>
+          </Link>
 
-        {username ? (
-          <div className={styles.user}>
-            <Link href={`/changepassword`}>
-              <Button isActive={pathname === `/changepassword`}>Change password</Button>
-            </Link>
-            <Button onClick={logout} isActive={pathname === `/logout`}>
-              Log out
-            </Button>
-          </div>
-        ) : (
-          <div className={styles.user}>
-            <Link href={`/signin`}>
-              <Button isActive={pathname === `/signin`}>Sign in</Button>
-            </Link>
-            <Link href={`/signup`}>
-              <Button isActive={pathname === `/signup`}>Sign up</Button>
-            </Link>
-          </div>
-        )}
-      </div>
-    </header>
+          {username ? (
+            <div className={styles.user}>
+              <Link href={`/changepassword`}>
+                <Button isActive={pathname === `/changepassword`}>Изменить пароль</Button>
+              </Link>
+              <Button onClick={logout} isActive={pathname === `/logout`}>
+                Выход
+              </Button>
+            </div>
+          ) : (
+            <div className={styles.user}>
+              <Link href={`/signin`}>
+                <Button isActive={pathname === `/signin`}>Вход</Button>
+              </Link>
+              <Link href={`/signup`}>
+                <Button isActive={pathname === `/signup`}>Регистрация</Button>
+              </Link>
+            </div>
+          )}
+        </div>
+      </header>
+
+      <Toaster
+        position="top-center"
+        reverseOrder={true}
+        containerStyle={{
+          top: 90,
+          left: 40,
+          bottom: 80,
+          right: 40,
+        }}
+      />
+    </>
   );
 };
