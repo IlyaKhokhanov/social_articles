@@ -45,14 +45,18 @@ export const Comment = ({ comment }: { comment: IComment }) => {
         if (res.ok) {
           router.refresh();
         } else {
-          handleJWTRefresh().then((res) => {
-            if (res.access) {
-              storeToken(res.access, 'access');
-              deleteComment(comment.article, comment.id).then((res) => {
-                if (res.ok) router.refresh();
-              });
-            }
-          });
+          handleJWTRefresh()
+            .then((res) => {
+              if (res.access) {
+                storeToken(res.access, 'access');
+                deleteComment(comment.article, comment.id)
+                  .then((res) => {
+                    if (res.ok) router.refresh();
+                  })
+                  .catch((err) => console.error(err));
+              }
+            })
+            .catch((err) => console.error(err));
         }
       })
       .catch((err) => console.error(err));
@@ -64,14 +68,18 @@ export const Comment = ({ comment }: { comment: IComment }) => {
         if (res.content) {
           setEditMode(false);
         } else {
-          handleJWTRefresh().then((res) => {
-            if (res.access) {
-              storeToken(res.access, 'access');
-              changeComment(comment.article, comment.id, { content: textComment }).then((res) => {
-                if (res.content) setEditMode(false);
-              });
-            }
-          });
+          handleJWTRefresh()
+            .then((res) => {
+              if (res.access) {
+                storeToken(res.access, 'access');
+                changeComment(comment.article, comment.id, { content: textComment })
+                  .then((res) => {
+                    if (res.content) setEditMode(false);
+                  })
+                  .catch((err) => console.error(err));
+              }
+            })
+            .catch((err) => console.error(err));
         }
       })
       .catch((err) => console.error(err));

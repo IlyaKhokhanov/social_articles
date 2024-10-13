@@ -3,7 +3,7 @@ import * as yup from 'yup';
 const Regex = {
   username: /^[A-Za-z@_+\-./?0-9]{6,}$/,
   email: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-  lowercase: /[a-z]/, // @/./+/-/_
+  lowercase: /[a-z]/,
   uppercase: /[A-Z]/,
   number: /[0-9]/,
   symbol: /[!@#$%^&*()_+{}[\]:;<>,.?~\\/-]/,
@@ -100,19 +100,3 @@ export const schemaArticle = yup.object().shape({
 
   image: yup.mixed().notRequired(),
 });
-
-export function isFile(obj: unknown): obj is FileList {
-  if (
-    typeof obj === 'object' &&
-    obj &&
-    '0' in obj &&
-    typeof obj[0] === 'object' &&
-    obj[0] &&
-    'size' in obj[0] &&
-    typeof obj[0].size === 'number' &&
-    'type' in obj[0] &&
-    typeof obj[0].type === 'string'
-  )
-    return true;
-  return false;
-}

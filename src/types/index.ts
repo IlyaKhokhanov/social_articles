@@ -1,15 +1,15 @@
 export interface IArticle {
   content: string;
   id: number;
-  image: string | File;
+  image: string;
   title: string;
   author: IAuthor;
 }
 
 export interface IAddArticle {
   content: string;
-  image: File | null;
   title: string;
+  image?: string | null;
 }
 
 export interface IAuthor {

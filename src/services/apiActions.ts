@@ -65,11 +65,11 @@ const articleManipulations = async (method: string, id?: number | string, data?:
     method,
     headers: {
       // 'Content-Type': 'application/json',
-      // 'Content-Type': 'multipart/form-data',
+      'Content-Type': 'multipart/form-data',
       // 'Content-Type': 'multipart/form-data; boundary="----WebKitFormBoundary7MA4YWxkTrZu0gW"',
       Authorization: `Bearer ${accessToken}`,
     },
-    body: data ? JSON.stringify(data) : '',
+    body: data || '',
   });
 };
 

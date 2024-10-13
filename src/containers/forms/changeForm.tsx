@@ -10,7 +10,7 @@ import { schemaChange } from './validation';
 import { FormError } from './formError';
 import { IChangePassword } from '@/types';
 import { Button } from '@/components';
-import { changePassword, handleJWTRefresh, login, storeToken } from '@/services/apiActions';
+import { changePassword, handleJWTRefresh, storeToken } from '@/services/apiActions';
 import { useAppSelector } from '@/redux/hooks';
 
 import styles from './form.module.css';
@@ -34,19 +34,23 @@ export const ChangeForm = () => {
     changePassword(formData)
       .then((res) => {
         if (res.detail) {
-          handleJWTRefresh().then((res) => {
-            if (res.access) {
-              storeToken(res.access, 'access');
-              changePassword(formData).then((res) => {
-                if (res.Success) {
-                  reset();
-                  router.replace('/');
-                } else {
-                  setError(true);
-                }
-              });
-            }
-          });
+          handleJWTRefresh()
+            .then((res) => {
+              if (res.access) {
+                storeToken(res.access, 'access');
+                changePassword(formData)
+                  .then((res) => {
+                    if (res.Success) {
+                      reset();
+                      router.replace('/');
+                    } else {
+                      setError(true);
+                    }
+                  })
+                  .catch((err) => console.error(err));
+              }
+            })
+            .catch((err) => console.error(err));
         }
         if (res.Success) {
           reset();

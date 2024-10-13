@@ -27,15 +27,23 @@ export const ArticleId = ({ article, comments }: { article: IArticle; comments: 
       .then((res) => {
         if (res.ok) {
           router.replace('/');
+          router.refresh();
         } else {
-          handleJWTRefresh().then((res) => {
-            if (res.access) {
-              storeToken(res.access, 'access');
-              articleManipulations('DELETE', article.id).then((res) => {
-                if (res.ok) router.replace('/');
-              });
-            }
-          });
+          handleJWTRefresh()
+            .then((res) => {
+              if (res.access) {
+                storeToken(res.access, 'access');
+                articleManipulations('DELETE', article.id)
+                  .then((res) => {
+                    if (res.ok) {
+                      router.replace('/');
+                      router.refresh();
+                    }
+                  })
+                  .catch((err) => console.error(err));
+              }
+            })
+            .catch((err) => console.error(err));
         }
       })
       .catch((err) => console.error(err));
