@@ -7,6 +7,7 @@ const Regex = {
   uppercase: /[A-Z]/,
   number: /[0-9]/,
   symbol: /[!@#$%^&*()_+{}[\]:;<>,.?~\\/-]/,
+  name: /^[A-ZА-ЯЁ].*$/,
 };
 
 export const schemaRegister = yup.object().shape({
@@ -21,12 +22,12 @@ export const schemaRegister = yup.object().shape({
   first_name: yup
     .string()
     .required('Имя обязательное поле')
-    .matches(/^[\p{Lu}\p{Lt}].*$/u, 'Имя должно начинаться с заглавной буквы'),
+    .matches(Regex.name, 'Имя должно начинаться с заглавной буквы'),
 
   last_name: yup
     .string()
     .required('Фамилия обязательное поле')
-    .matches(/^[\p{Lu}\p{Lt}].*$/u, 'Фамилия должна начинаться с заглавной буквы'),
+    .matches(Regex.name, 'Фамилия должна начинаться с заглавной буквы'),
 
   email: yup
     .string()
@@ -91,12 +92,4 @@ export const schemaChange = yup.object().shape({
     .string()
     .required('Confirm password')
     .oneOf([yup.ref('password')], 'Passwords must match'),
-});
-
-export const schemaArticle = yup.object().shape({
-  title: yup.string().required('Имя пользователя обязательное поле'),
-
-  content: yup.string().required('Пароль обязательное поле'),
-
-  image: yup.mixed().notRequired(),
 });
