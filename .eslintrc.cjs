@@ -18,5 +18,5 @@ module.exports = {
       ],
     },
   ],
-  rules: { '@typescript-eslint/no-misused-promises': 'false' },
+  rules: { '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: false }] },
 };

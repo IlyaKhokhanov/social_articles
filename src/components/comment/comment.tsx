@@ -67,6 +67,7 @@ export const Comment = ({ comment }: { comment: IComment }) => {
     const response = await changeComment(comment.article, comment.id, { content: textComment });
     if (response) {
       setEditMode(false);
+      router.refresh();
       showToast({ message: 'Комментарий изменен', thisError: false });
     } else {
       const responseToken = await handleJWTRefresh();
@@ -78,6 +79,7 @@ export const Comment = ({ comment }: { comment: IComment }) => {
 
         if (responseSecond) {
           setEditMode(false);
+          router.refresh();
           showToast({ message: 'Комментарий изменен', thisError: false });
         }
       }

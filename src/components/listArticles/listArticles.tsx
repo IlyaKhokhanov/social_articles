@@ -17,7 +17,7 @@ export const ListArticles = ({ data }: { data: IArticle[] }) => {
   const router = useRouter();
 
   useEffect(() => {
-    if (user) setUsername(user);
+    setUsername(user);
   }, [user]);
 
   const addArticleHandle = () => {

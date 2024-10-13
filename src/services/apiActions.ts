@@ -16,10 +16,7 @@ const removeTokens = () => {
   Cookies.remove('refreshToken');
 };
 
-const instance = axios.create({
-  baseURL: 'https://darkdes-django-t3b02.tw1.ru/api/v1/',
-  headers: { Authorization: `Bearer ${getToken('access')}` },
-});
+const instance = axios.create({ baseURL: 'https://darkdes-django-t3b02.tw1.ru/api/v1/' });
 
 const registration = async (data: ISignup) => {
   return await instance
@@ -68,7 +65,10 @@ const handleJWTRefresh = async () => {
 const changePassword = async (data: IChangePassword): Promise<boolean | 'refresh' | void> => {
   return await instance
     .put(`change-password/`, data, {
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getToken('access')}`,
+      },
     })
     .then(({ data }: { data: { Success?: boolean; detail?: string } }) => data)
     .then((res) => {
@@ -91,7 +91,10 @@ const addArticle = async (data: IAddArticle) => {
 
   return await instance
     .post(`articles/`, form_data, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${getToken('access')}`,
+      },
     })
     .then(({ data }: { data: { title?: string; content?: string } }) =>
       data?.title && data?.content ? true : false
@@ -107,7 +110,10 @@ const changeArticle = async (data: IAddArticle, id: number) => {
 
   return await instance
     .patch(`articles/${id}/`, form_data, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${getToken('access')}`,
+      },
     })
     .then(({ data }: { data: { title?: string; content?: string } }) =>
       data?.title && data?.content ? true : false
@@ -117,14 +123,17 @@ const changeArticle = async (data: IAddArticle, id: number) => {
 
 const deleteArticle = async (id: number) => {
   return await instance.delete(`articles/${id}/`, {
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken('access')}` },
   });
 };
 
 const addComment = async (articleid: number, data: { content: string; parent?: number | null }) => {
   return await instance
     .post(`articles/${articleid}/comments/`, data, {
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getToken('access')}`,
+      },
     })
     .then(({ data }: { data: { content?: string } }) => (data?.content ? true : false))
     .catch((error) => console.log(error));
@@ -133,7 +142,10 @@ const addComment = async (articleid: number, data: { content: string; parent?: n
 const changeComment = async (articleid: number, commentId: number, data: { content: string }) => {
   return await instance
     .put(`articles/${articleid}/comments/${commentId}/`, data, {
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getToken('access')}`,
+      },
     })
     .then(({ data }: { data: { content?: string } }) => (data?.content ? true : false))
     .catch((error) => console.log(error));
@@ -141,7 +153,7 @@ const changeComment = async (articleid: number, commentId: number, data: { conte
 
 const deleteComment = async (articleid: number, commentId: number) => {
   return await instance.delete(`articles/${articleid}/comments/${commentId}/`, {
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken('access')}` },
   });
 };
 

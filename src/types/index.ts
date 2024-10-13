@@ -50,6 +50,3 @@ export interface ITokens {
   access: string;
 }
 
-export interface IErrorLogin {
-  detail: string;
-}

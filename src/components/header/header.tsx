@@ -25,6 +25,7 @@ export const Header = () => {
     dispatch(setUser(null));
     localStorage.removeItem('user');
     removeTokens();
+    router.refresh();
     router.push('/');
   };
 
