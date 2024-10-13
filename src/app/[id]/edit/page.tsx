@@ -1,4 +1,4 @@
-import { WriteArticleForm } from '@/components';
+import { ArticleForm } from '@/components';
 import { IArticle } from '@/types';
 
 async function getServerSideProps(id: string): Promise<IArticle> {
@@ -11,7 +11,7 @@ async function getServerSideProps(id: string): Promise<IArticle> {
 const ArticleIdPage = async ({ params }: { params: { id: string } }) => {
   const article = await getServerSideProps(params.id);
 
-  return <WriteArticleForm data={article} />;
+  return <ArticleForm data={article} />;
 };
 
 export default ArticleIdPage;

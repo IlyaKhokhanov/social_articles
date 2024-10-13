@@ -1,16 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
+import { registration } from '@/services/apiActions';
 import { schemaRegister } from './validation';
 import { FormError } from './formError';
 import { ISignup } from '@/types';
 import { Button } from '@/components';
-import { registration } from '@/services/apiActions';
 import { useAppSelector } from '@/redux/hooks';
 import { showToast } from '@/utils';
 
@@ -18,7 +18,6 @@ import styles from './form.module.css';
 
 export const SignupForm = () => {
   const { user } = useAppSelector((state) => state.app);
-  const [error, setError] = useState(null);
   const router = useRouter();
 
   const {
@@ -31,20 +30,17 @@ export const SignupForm = () => {
     resolver: yupResolver(schemaRegister),
   });
 
-  const onSubmit = (formData: ISignup) => {
+  const onSubmit = async (formData: ISignup) => {
     showToast({ message: 'Идет отправка данных...', thisError: false });
-    registration(formData)
-      .then((res) => {
-        if (!res.user) {
-          showToast({ message: 'Имя пользователя уже занято', thisError: true });
-          setError(res.username[0] || res.email[0]);
-        } else {
-          reset();
-          router.replace('/signin');
-          showToast({ message: 'Пользователь зарегистрирован', thisError: false });
-        }
-      })
-      .catch((err) => console.error(err));
+
+    const response = await registration(formData);
+    if (response) {
+      reset();
+      router.replace('/signin');
+      showToast({ message: 'Пользователь зарегистрирован', thisError: false });
+    } else {
+      showToast({ message: 'Имя пользователя уже занято', thisError: true });
+    }
   };
 
   useEffect(() => {
@@ -108,9 +104,7 @@ export const SignupForm = () => {
           Зарегистрироваться
         </Button>
 
-        {error && <FormError error={{ message: error }} />}
-
-        <div style={{ marginTop: error ? 0 : 28 }}>
+        <div style={{ marginTop: 28 }}>
           Уже есть аккаунт? <Link href="signin">Войти</Link> сейчас.
         </div>
       </form>

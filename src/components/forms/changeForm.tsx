@@ -1,16 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
+import { changePassword, handleJWTRefresh } from '@/services/apiActions';
 import { schemaChange } from './validation';
 import { FormError } from './formError';
 import { IChangePassword } from '@/types';
 import { Button } from '@/components';
-import { changePassword, handleJWTRefresh, storeToken } from '@/services/apiActions';
 import { useAppSelector } from '@/redux/hooks';
 import { showToast } from '@/utils';
 
@@ -18,7 +17,6 @@ import styles from './form.module.css';
 
 export const ChangeForm = () => {
   const { user } = useAppSelector((state) => state.app);
-  const [error, setError] = useState(false);
   const router = useRouter();
 
   const {
@@ -31,41 +29,31 @@ export const ChangeForm = () => {
     resolver: yupResolver(schemaChange),
   });
 
-  const onSubmit = (formData: IChangePassword) => {
+  const onSubmit = async (formData: IChangePassword) => {
     showToast({ message: 'Идет отправка данных...', thisError: false });
-    changePassword(formData)
-      .then((res) => {
-        if (res.detail) {
-          handleJWTRefresh()
-            .then((res) => {
-              if (res.access) {
-                storeToken(res.access, 'access');
-                changePassword(formData)
-                  .then((res) => {
-                    if (res.Success) {
-                      reset();
-                      router.replace('/');
-                      showToast({ message: 'Пароль обновлен', thisError: false });
-                    } else {
-                      setError(true);
-                      showToast({ message: 'Старый пароль введен неверно', thisError: true });
-                    }
-                  })
-                  .catch((err) => console.error(err));
-              }
-            })
-            .catch((err) => console.error(err));
-        }
-        if (res.Success) {
+
+    const response = await changePassword(formData);
+    if (response) {
+      reset();
+      router.replace('/');
+      showToast({ message: 'Пароль обновлен', thisError: false });
+    } else if (typeof response === 'string' && response === 'refresh') {
+      const responseToken = await handleJWTRefresh();
+
+      if (responseToken) {
+        const responseSecond = await changePassword(formData);
+
+        if (responseSecond) {
           reset();
           router.replace('/');
           showToast({ message: 'Пароль обновлен', thisError: false });
-        } else {
-          setError(true);
+        } else if (!responseSecond) {
           showToast({ message: 'Старый пароль введен неверно', thisError: true });
         }
-      })
-      .catch((err) => console.error(err));
+      }
+    } else {
+      showToast({ message: 'Старый пароль введен неверно', thisError: true });
+    }
   };
 
   useEffect(() => {
@@ -109,12 +97,6 @@ export const ChangeForm = () => {
         <Button type="submit" disabled={!isValid}>
           Изменить
         </Button>
-
-        {error && <FormError error={{ message: 'Старый пароль введен неверно' }} />}
-
-        <div style={{ marginTop: error ? 0 : 28 }}>
-          Нет аккаунта? <Link href={'/signup'}>Зарегистрируйся</Link> сейчас.
-        </div>
       </form>
     </div>
   );

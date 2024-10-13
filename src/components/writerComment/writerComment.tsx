@@ -3,9 +3,10 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { useAppSelector } from '@/redux/hooks';
+import { addComment, handleJWTRefresh } from '@/services/apiActions';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { setCommentAnswer } from '@/redux/slices/appSlice';
 import { Button } from '../button/button';
-import { addComment, handleJWTRefresh, storeToken } from '@/services/apiActions';
 import { showToast } from '@/utils';
 
 import styles from './writerComment.module.css';
@@ -13,6 +14,7 @@ import styles from './writerComment.module.css';
 export const WriterComment = ({ articleId }: { articleId: number }) => {
   const [username, setUsername] = useState<string | null>(null);
   const { user, commentAnswer } = useAppSelector((state) => state.app);
+  const dispatch = useAppDispatch();
   const router = useRouter();
 
   const [inputValue, setInputValue] = useState<string>('');
@@ -21,39 +23,33 @@ export const WriterComment = ({ articleId }: { articleId: number }) => {
     if (user) setUsername(user);
   }, [user]);
 
-  const sendCommentHandler = () => {
+  const sendCommentHandler = async () => {
     showToast({ message: 'Идет отправка...', thisError: false });
     const commentData = {
       content: inputValue,
       parent: commentAnswer || null,
     };
 
-    addComment(articleId, commentData)
-      .then((res) => {
-        if (res.content) {
+    const response = await addComment(articleId, commentData);
+    if (response) {
+      dispatch(setCommentAnswer(null));
+      setInputValue('');
+      router.refresh();
+      showToast({ message: 'Комментарий отправлен', thisError: false });
+    } else {
+      const responseToken = await handleJWTRefresh();
+
+      if (responseToken) {
+        const responseSecond = await addComment(articleId, commentData);
+
+        if (responseSecond) {
+          dispatch(setCommentAnswer(null));
           setInputValue('');
           router.refresh();
           showToast({ message: 'Комментарий отправлен', thisError: false });
-        } else {
-          handleJWTRefresh()
-            .then((res) => {
-              if (res.access) {
-                storeToken(res.access, 'access');
-                addComment(articleId, commentData)
-                  .then((res) => {
-                    if (res.content) {
-                      setInputValue('');
-                      router.refresh();
-                      showToast({ message: 'Комментарий отправлен', thisError: false });
-                    }
-                  })
-                  .catch((err) => console.error(err));
-              }
-            })
-            .catch((err) => console.error(err));
         }
-      })
-      .catch((err) => console.error(err));
+      }
+    }
   };
 
   const inputHandler = (e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value);

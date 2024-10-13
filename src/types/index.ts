@@ -9,7 +9,7 @@ export interface IArticle {
 export interface IAddArticle {
   content: string;
   title: string;
-  image?: string | null;
+  image: File | null;
 }
 
 export interface IAuthor {

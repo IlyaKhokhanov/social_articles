@@ -1,9 +1,9 @@
 import { Button } from '../button/button';
-import { IActionButtons } from './actionButtons.props';
+import { IActionButtons } from './articleActionButtons.props';
 
-import styles from './actionButtons.module.css';
+import styles from './articleActionButtons.module.css';
 
-export const ActionButtons = ({ editBtn, deleteBtn }: IActionButtons) => {
+export const ArticleActionButtons = ({ editBtn, deleteBtn }: IActionButtons) => {
   return (
     <div className={styles.wrapper}>
       {editBtn && (

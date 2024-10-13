@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useEffect, useState } from 'react';
 
-import { changeComment, deleteComment, handleJWTRefresh, storeToken } from '@/services/apiActions';
+import { changeComment, deleteComment, handleJWTRefresh } from '@/services/apiActions';
 import { setCommentAnswer } from '@/redux/slices/appSlice';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { Button } from '../button/button';
@@ -40,58 +40,48 @@ export const Comment = ({ comment }: { comment: IComment }) => {
     setTextComment(comment.content);
   };
 
-  const deleteCommentHandler = () => {
+  const deleteCommentHandler = async () => {
     showToast({ message: 'Идет удаление...', thisError: false });
-    deleteComment(comment.article, comment.id)
-      .then((res) => {
-        if (res.ok) {
+
+    const response = await deleteComment(comment.article, comment.id);
+    if (response.status === 204) {
+      router.refresh();
+      showToast({ message: 'Комментарий удален', thisError: false });
+    } else {
+      const responseToken = await handleJWTRefresh();
+
+      if (responseToken) {
+        const responseSecond = await deleteComment(comment.article, comment.id);
+
+        if (responseSecond.status === 204) {
           router.refresh();
           showToast({ message: 'Комментарий удален', thisError: false });
-        } else {
-          handleJWTRefresh()
-            .then((res) => {
-              if (res.access) {
-                storeToken(res.access, 'access');
-                deleteComment(comment.article, comment.id)
-                  .then((res) => {
-                    if (res.ok) router.refresh();
-                    showToast({ message: 'Комментарий удален', thisError: false });
-                  })
-                  .catch((err) => console.error(err));
-              }
-            })
-            .catch((err) => console.error(err));
         }
-      })
-      .catch((err) => console.error(err));
+      }
+    }
   };
 
-  const changeCommetHandler = () => {
+  const changeCommetHandler = async () => {
     showToast({ message: 'Изменение отправляется...', thisError: false });
-    changeComment(comment.article, comment.id, { content: textComment })
-      .then((res) => {
-        if (res.content) {
+
+    const response = await changeComment(comment.article, comment.id, { content: textComment });
+    if (response) {
+      setEditMode(false);
+      showToast({ message: 'Комментарий изменен', thisError: false });
+    } else {
+      const responseToken = await handleJWTRefresh();
+
+      if (responseToken) {
+        const responseSecond = await changeComment(comment.article, comment.id, {
+          content: textComment,
+        });
+
+        if (responseSecond) {
           setEditMode(false);
-          showToast({ message: 'Изменение отправлено', thisError: false });
-        } else {
-          handleJWTRefresh()
-            .then((res) => {
-              if (res.access) {
-                storeToken(res.access, 'access');
-                changeComment(comment.article, comment.id, { content: textComment })
-                  .then((res) => {
-                    if (res.content) {
-                      setEditMode(false);
-                      showToast({ message: 'Изменение отправлено', thisError: false });
-                    }
-                  })
-                  .catch((err) => console.error(err));
-              }
-            })
-            .catch((err) => console.error(err));
+          showToast({ message: 'Комментарий изменен', thisError: false });
         }
-      })
-      .catch((err) => console.error(err));
+      }
+    }
   };
 
   return (

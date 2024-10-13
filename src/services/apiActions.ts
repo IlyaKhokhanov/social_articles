@@ -1,7 +1,7 @@
+import axios from 'axios';
 import Cookies from 'js-cookie';
-import { IAddArticle, IChangePassword, ISignin, ISignup, ITokens } from '@/types';
 
-const url = 'https://darkdes-django-t3b02.tw1.ru/api/v1/';
+import type { IAddArticle, IChangePassword, ISignin, ISignup, ITokens } from '@/types';
 
 const storeToken = (token: string, type: 'access' | 'refresh') => {
   Cookies.set(type + 'Token', token);
@@ -16,108 +16,146 @@ const removeTokens = () => {
   Cookies.remove('refreshToken');
 };
 
+const instance = axios.create({
+  baseURL: 'https://darkdes-django-t3b02.tw1.ru/api/v1/',
+  headers: { Authorization: `Bearer ${getToken('access')}` },
+});
+
 const registration = async (data: ISignup) => {
-  return fetch(`${url}registration/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  }).then((res) => res.json());
+  return await instance
+    .post(`registration/`, data, { headers: { 'Content-Type': 'application/json' } })
+    .then(({ data }: { data: { user?: string } }) => data)
+    .then((res) => (res?.user ? true : false))
+    .catch((error) => console.log(error));
 };
 
-const login = async (data: ISignin): Promise<ITokens> => {
-  return fetch(`${url}token/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  }).then((res) => res.json());
+const login = async (data: ISignin) => {
+  return await instance
+    .post(`token/`, data, { headers: { 'Content-Type': 'application/json' } })
+    .then(({ data }: { data: ITokens }) => data)
+    .then((res) => {
+      if (res?.refresh && res?.access) {
+        storeToken(res.refresh, 'refresh');
+        storeToken(res.access, 'access');
+        return true;
+      } else {
+        return false;
+      }
+    })
+    .catch((error) => console.log(error));
 };
 
 const handleJWTRefresh = async () => {
   const refreshToken = getToken('refresh');
-  return fetch(`${url}token/refresh/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ refresh: refreshToken }),
-  }).then((res) => res.json());
+  return await instance
+    .post(
+      `token/refresh/`,
+      { refresh: refreshToken },
+      { headers: { 'Content-Type': 'application/json' } }
+    )
+    .then(({ data }: { data: { access?: string } }) => data)
+    .then((res) => {
+      if (res.access) {
+        storeToken(res.access, 'access');
+        return true;
+      } else {
+        return false;
+      }
+    })
+    .catch((error) => console.log(error));
 };
 
-const changePassword = async (data: IChangePassword) => {
-  const accessToken = getToken('access');
-  return fetch(`${url}change-password/`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`,
-    },
-    body: JSON.stringify(data),
-  }).then((res) => res.json());
+const changePassword = async (data: IChangePassword): Promise<boolean | 'refresh' | void> => {
+  return await instance
+    .put(`change-password/`, data, {
+      headers: { 'Content-Type': 'application/json' },
+    })
+    .then(({ data }: { data: { Success?: boolean; detail?: string } }) => data)
+    .then((res) => {
+      if (res?.Success) {
+        return true;
+      } else if (res?.detail) {
+        return 'refresh';
+      } else {
+        return false;
+      }
+    })
+    .catch((error) => console.log(error));
 };
 
-const articleManipulations = async (method: string, id?: number | string, data?: IAddArticle) => {
-  const accessToken = getToken('access');
-  return fetch(`${url}articles/${id + '/' || ''}`, {
-    method,
-    headers: {
-      // 'Content-Type': 'application/json',
-      'Content-Type': 'multipart/form-data',
-      // 'Content-Type': 'multipart/form-data; boundary="----WebKitFormBoundary7MA4YWxkTrZu0gW"',
-      Authorization: `Bearer ${accessToken}`,
-    },
-    body: data || '',
+const addArticle = async (data: IAddArticle) => {
+  const form_data = new FormData();
+  if (data.image) form_data.append('image', data.image, data.image.name);
+  form_data.append('title', data.title);
+  form_data.append('content', data.content);
+
+  return await instance
+    .post(`articles/`, form_data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    .then(({ data }: { data: { title?: string; content?: string } }) =>
+      data?.title && data?.content ? true : false
+    )
+    .catch((error) => console.log(error));
+};
+
+const changeArticle = async (data: IAddArticle, id: number) => {
+  const form_data = new FormData();
+  if (data.image) form_data.append('image', data.image, data.image.name);
+  form_data.append('title', data.title);
+  form_data.append('content', data.content);
+
+  return await instance
+    .patch(`articles/${id}/`, form_data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    .then(({ data }: { data: { title?: string; content?: string } }) =>
+      data?.title && data?.content ? true : false
+    )
+    .catch((error) => console.log(error));
+};
+
+const deleteArticle = async (id: number) => {
+  return await instance.delete(`articles/${id}/`, {
+    headers: { 'Content-Type': 'application/json' },
   });
 };
 
 const addComment = async (articleid: number, data: { content: string; parent?: number | null }) => {
-  const accessToken = getToken('access');
-  return fetch(`${url}articles/${articleid}/comments/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`,
-    },
-    body: data ? JSON.stringify(data) : '',
-  }).then((res) => res.json());
-};
-
-const deleteComment = async (articleid: number, commentId: number) => {
-  const accessToken = getToken('access');
-  return fetch(`${url}articles/${articleid}/comments/${commentId}`, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+  return await instance
+    .post(`articles/${articleid}/comments/`, data, {
+      headers: { 'Content-Type': 'application/json' },
+    })
+    .then(({ data }: { data: { content?: string } }) => (data?.content ? true : false))
+    .catch((error) => console.log(error));
 };
 
 const changeComment = async (articleid: number, commentId: number, data: { content: string }) => {
-  const accessToken = getToken('access');
-  return fetch(`${url}articles/${articleid}/comments/${commentId}/`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`,
-    },
-    body: JSON.stringify(data),
-  }).then((res) => res.json());
+  return await instance
+    .put(`articles/${articleid}/comments/${commentId}/`, data, {
+      headers: { 'Content-Type': 'application/json' },
+    })
+    .then(({ data }: { data: { content?: string } }) => (data?.content ? true : false))
+    .catch((error) => console.log(error));
+};
+
+const deleteComment = async (articleid: number, commentId: number) => {
+  return await instance.delete(`articles/${articleid}/comments/${commentId}/`, {
+    headers: { 'Content-Type': 'application/json' },
+  });
 };
 
 export {
   getToken,
-  storeToken,
   removeTokens,
   registration,
   login,
   handleJWTRefresh,
   changePassword,
-  articleManipulations,
+  addArticle,
+  changeArticle,
+  deleteArticle,
   addComment,
-  deleteComment,
   changeComment,
+  deleteComment,
 };

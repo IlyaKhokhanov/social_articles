@@ -4,8 +4,8 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
-import { ActionButtons, Comment, WriterComment } from '@/components';
-import { articleManipulations, handleJWTRefresh, storeToken } from '@/services/apiActions';
+import { deleteArticle, handleJWTRefresh } from '@/services/apiActions';
+import { ArticleActionButtons, Comment, WriterComment } from '@/components';
 import { useAppSelector } from '@/redux/hooks';
 import { IArticle, IComment } from '@/types';
 import { showToast } from '@/utils';
@@ -17,40 +17,33 @@ export const ArticleId = ({ article, comments }: { article: IArticle; comments: 
   const { user } = useAppSelector((state) => state.app);
   const router = useRouter();
 
-  const author = article.author.username;
+  const author = article.author?.username;
 
   useEffect(() => {
     if (user) setUsername(user);
   }, [user]);
 
-  const deleteArticleHandle = useCallback(() => {
+  const deleteArticleHandle = useCallback(async () => {
     showToast({ message: 'Идет удаление...', thisError: false });
-    articleManipulations('DELETE', article.id)
-      .then((res) => {
-        if (res.ok) {
+
+    const response = await deleteArticle(article.id);
+    if (response.status === 204) {
+      router.replace('/');
+      router.refresh();
+      showToast({ message: 'Статья удалена', thisError: false });
+    } else {
+      const responseToken = await handleJWTRefresh();
+
+      if (responseToken) {
+        const responseSecond = await deleteArticle(article.id);
+
+        if (responseSecond.status === 204) {
           router.replace('/');
           router.refresh();
           showToast({ message: 'Статья удалена', thisError: false });
-        } else {
-          handleJWTRefresh()
-            .then((res) => {
-              if (res.access) {
-                storeToken(res.access, 'access');
-                articleManipulations('DELETE', article.id)
-                  .then((res) => {
-                    if (res.ok) {
-                      router.replace('/');
-                      router.refresh();
-                      showToast({ message: 'Статья удалена', thisError: false });
-                    }
-                  })
-                  .catch((err) => console.error(err));
-              }
-            })
-            .catch((err) => console.error(err));
         }
-      })
-      .catch((err) => console.error(err));
+      }
+    }
   }, []);
 
   const editArticleHandle = useCallback(() => {
@@ -60,7 +53,7 @@ export const ArticleId = ({ article, comments }: { article: IArticle; comments: 
   return (
     <div className={styles.container}>
       {username === author && (
-        <ActionButtons
+        <ArticleActionButtons
           editBtn={{ cb: editArticleHandle, text: 'Редактировать статью' }}
           author={article.author?.username}
           deleteBtn={{ cb: deleteArticleHandle, text: 'Удалить статью' }}

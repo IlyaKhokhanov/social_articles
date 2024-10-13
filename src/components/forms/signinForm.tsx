@@ -1,26 +1,25 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
+import { login } from '@/services/apiActions';
 import { schemaLogin } from './validation';
 import { FormError } from './formError';
 import { ISignin } from '@/types';
 import { Button } from '@/components';
-import { login, storeToken } from '@/services/apiActions';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { setUser } from '@/redux/slices/appSlice';
+import { showToast } from '@/utils';
 
 import styles from './form.module.css';
-import { showToast } from '@/utils';
 
 export const SigninForm = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.app);
-  const [error, setError] = useState(false);
   const router = useRouter();
 
   const {
@@ -33,27 +32,22 @@ export const SigninForm = () => {
     resolver: yupResolver(schemaLogin),
   });
 
-  const onSubmit = (formData: ISignin) => {
+  const onSubmit = async (formData: ISignin) => {
     showToast({ message: 'Выполненяется вход...', thisError: false });
-    login(formData)
-      .then((res) => {
-        if (res.refresh && res.access) {
-          dispatch(setUser(formData.username));
-          storeToken(res.refresh, 'refresh');
-          storeToken(res.access, 'access');
-          localStorage.setItem('user', formData.username);
-          reset();
-          router.replace('/');
-          showToast({ message: 'Вы успешно вошли', thisError: false });
-        } else {
-          setError(true);
-          showToast({
-            message: 'Не найдена активная учетная запись с указанными учетными данными',
-            thisError: true,
-          });
-        }
-      })
-      .catch((err) => console.error(err));
+
+    const response = await login(formData);
+    if (response) {
+      dispatch(setUser(formData.username));
+      localStorage.setItem('user', formData.username);
+      reset();
+      router.replace('/');
+      showToast({ message: 'Вы успешно вошли', thisError: false });
+    } else {
+      showToast({
+        message: 'Не найдена активная учетная запись с указанными учетными данными',
+        thisError: true,
+      });
+    }
   };
 
   useEffect(() => {
@@ -88,13 +82,7 @@ export const SigninForm = () => {
           Войти
         </Button>
 
-        {error && (
-          <FormError
-            error={{ message: 'Не найдена активная учетная запись с указанными учетными данными' }}
-          />
-        )}
-
-        <div style={{ marginTop: error ? 0 : 28 }}>
+        <div style={{ marginTop: 28 }}>
           Нет аккаунта? <Link href="signup">Зарегистрироваться</Link> сейчас.
         </div>
       </form>

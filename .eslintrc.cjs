@@ -18,15 +18,5 @@ module.exports = {
       ],
     },
   ],
-  rules: {
-    '@typescript-eslint/no-misused-promises': 'false',
-    '@typescript-eslint/no-unsafe-member-access': 'false',
-    '@typescript-eslint/no-unsafe-argument': 'false',
-    '@typescript-eslint/no-unsafe-return': 'false',
-  },
+  rules: { '@typescript-eslint/no-misused-promises': 'false' },
 };
-
-// '@typescript-eslint/no-misused-promises': 'false',
-// '@typescript-eslint/no-unsafe-member-access': 'false',
-// '@typescript-eslint/no-unsafe-argument': 'false',
-// '@typescript-eslint/no-unsafe-return': 'false',

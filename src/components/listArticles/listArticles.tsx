@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { ActionButtons, Button } from '@/components';
+import { ArticleActionButtons, Button } from '@/components';
 import { useAppSelector } from '@/redux/hooks';
 import { IArticle } from '@/types';
 
@@ -26,7 +26,9 @@ export const ListArticles = ({ data }: { data: IArticle[] }) => {
 
   return (
     <div className={styles.container}>
-      {username && <ActionButtons editBtn={{ cb: addArticleHandle, text: 'Написать статью' }} />}
+      {username && (
+        <ArticleActionButtons editBtn={{ cb: addArticleHandle, text: 'Написать статью' }} />
+      )}
       <div className={styles.articles}>
         {data.map((el) => (
           <div className={styles.card} key={el.id}>
