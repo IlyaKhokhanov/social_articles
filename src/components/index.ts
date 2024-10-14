@@ -10,3 +10,4 @@ export { SignupForm } from './forms/signupForm';
 export { SigninForm } from './forms/signinForm';
 export { ChangeForm } from './forms/changeForm';
 export { ArticleForm } from './forms/articleForn';
+export { Loader } from './loader/loader';

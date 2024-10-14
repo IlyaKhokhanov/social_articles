@@ -25,9 +25,13 @@ export const Comment = ({ comment }: { comment: IComment }) => {
   const isActiveAnswer = comment.id === commentAnswer;
 
   useEffect(() => {
-    if (user) setUsername(user);
+    setUsername(user);
     setTextComment(comment.content);
   }, [user]);
+
+  useEffect(() => {
+    setTextComment(comment.content);
+  }, []);
 
   const answerHandler = () => {
     dispatch(setCommentAnswer(isActiveAnswer ? null : comment.id));

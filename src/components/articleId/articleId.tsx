@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { deleteArticle, handleJWTRefresh } from '@/services/apiActions';
 import { ArticleActionButtons, Comment, WriterComment } from '@/components';
@@ -20,10 +20,10 @@ export const ArticleId = ({ article, comments }: { article: IArticle; comments: 
   const author = article.author?.username;
 
   useEffect(() => {
-    if (user) setUsername(user);
+    setUsername(user);
   }, [user]);
 
-  const deleteArticleHandle = useCallback(async () => {
+  const deleteArticleHandle = async () => {
     showToast({ message: 'Идет удаление...', thisError: false });
 
     const response = await deleteArticle(article.id);
@@ -44,11 +44,9 @@ export const ArticleId = ({ article, comments }: { article: IArticle; comments: 
         }
       }
     }
-  }, []);
+  };
 
-  const editArticleHandle = useCallback(() => {
-    router.replace(`/${article.id}/edit`);
-  }, []);
+  const editArticleHandle = () => router.replace(`/${article.id}/edit`);
 
   return (
     <div className={styles.container}>
