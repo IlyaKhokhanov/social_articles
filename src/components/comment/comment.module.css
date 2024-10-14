@@ -25,6 +25,7 @@
 .text {
   line-height: 1.5;
   font-size: 18px;
+  overflow-wrap: break-word;
 }
 
 .change {
