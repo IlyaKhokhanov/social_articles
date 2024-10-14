@@ -1,0 +1,44 @@
+.wrapper {
+  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn,
+.btnDelete {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  color: #fff;
+  font-size: 16px;
+  background: #0cb4f1;
+  transition: opacity 0.3s;
+  font-family: Roboto, sans-serif;
+}
+
+.btnDelete {
+  background: #ff0000;
+}
+
+@media (hover: hover) {
+  .btn:hover,
+  .btnDelete:hover {
+    opacity: 0.7;
+  }
+}
+
+.btn:disabled,
+.btnDelete:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+@media (max-width: 400px) {
+  .btn,
+  .btnDelete {
+    padding: 7px 12px;
+  }
+}
