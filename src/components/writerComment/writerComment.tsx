@@ -55,28 +55,30 @@ export const WriterComment = ({ articleId }: { articleId: number }) => {
   const inputHandler = (e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value);
 
   return (
-    <div className={styles.wrapper}>
-      {username ? (
-        <>
-          <input
-            className={styles.input}
-            type="text"
-            value={inputValue}
-            onChange={inputHandler}
-            minLength={1}
-            placeholder="Комментарий"
-          />
-          <Button
-            className={styles.btn}
-            disabled={Boolean(!inputValue.length)}
-            onClick={sendCommentHandler}
-          >
-            Отправить
-          </Button>
-        </>
-      ) : (
-        <h3 className={styles.title}>Необходимо войти, чтобы оставить комментарий</h3>
-      )}
+    <div className={styles.container}>
+      <div className={styles.wrapper}>
+        {username ? (
+          <>
+            <input
+              className={styles.input}
+              type="text"
+              value={inputValue}
+              onChange={inputHandler}
+              minLength={1}
+              placeholder="Комментарий"
+            />
+            <Button
+              className={styles.btn}
+              disabled={Boolean(!inputValue.length)}
+              onClick={sendCommentHandler}
+            >
+              Отправить
+            </Button>
+          </>
+        ) : (
+          <h3 className={styles.title}>Необходимо войти, чтобы оставить комментарий</h3>
+        )}
+      </div>
     </div>
   );
 };
